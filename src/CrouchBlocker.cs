@@ -49,7 +49,7 @@ namespace Celeste.Mod.AnarchyCollab2022.Content {
 
                     // Emit check if we should crouch, and if we shouldn't, jump to end of if clause
                     cursor.Emit(OpCodes.Ldarg_0);
-                    cursor.EmitDelegate<Func<Player, bool>>(player => CrouchBlocker.GlobalBlockerCount <= 0 && !player.CollideCheck<CrouchBlocker>());
+                    cursor.EmitDelegate<Func<Player, bool>>(player => GlobalBlockerCount <= 0 && !player.CollideCheck<CrouchBlocker>());
                     cursor.Emit(OpCodes.Brfalse, dontDuckLabel);
 
                     // Return back to end of if clause
@@ -58,7 +58,7 @@ namespace Celeste.Mod.AnarchyCollab2022.Content {
             });
 
             duckingSetterHook = new Hook(typeof(Player).GetProperty(nameof(Player.Ducking)).GetSetMethod(), (Action<Action<Player, bool>, Player, bool>)((orig, self, ducking) => {
-                if (ducking && !self.StartedDashing && (CrouchBlocker.GlobalBlockerCount > 0 || self.CollideCheck<CrouchBlocker>())) {
+                if (ducking && !self.StartedDashing && (GlobalBlockerCount > 0 || self.CollideCheck<CrouchBlocker>())) {
                     return;
                 }
                 orig(self, ducking);
@@ -66,7 +66,7 @@ namespace Celeste.Mod.AnarchyCollab2022.Content {
 
             On.Celeste.Player.DashEnd += dashEndHook = (orig, self) => {
                 orig(self);
-                if (CrouchBlocker.GlobalBlockerCount > 0 || self.CollideCheck<CrouchBlocker>()) { self.Ducking = false; }
+                if (GlobalBlockerCount > 0 || self.CollideCheck<CrouchBlocker>()) { self.Ducking = false; }
             };
         }
 
