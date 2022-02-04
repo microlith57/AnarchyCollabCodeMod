@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -6,7 +7,7 @@ using Celeste;
 using Celeste.Mod.Entities;
 
 namespace Celeste.Mod.AnarchyCollab2022 {
-    [Tracked(false)]
+    [Tracked]
     [CustomEntity("AnarchyCollab2022/FragmentsStarJumpBlock")]
     public class FragmentsStarJumpBlock : Solid {
         private bool sinks;
@@ -14,11 +15,14 @@ namespace Celeste.Mod.AnarchyCollab2022 {
         private float yLerp;
         private float sinkTimer;
 
+        private static On.Celeste.Player.hook_RefillDash refillDashHook;
+
         public FragmentsStarJumpBlock(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, data.Height, safe: false) {
             Depth = -9000;
             sinks = data.Bool("sinks");
 
             Add(new LightOcclude());
+            Add(new ClimbBlocker(edge: false));
             startY = Y;
             SurfaceSoundIndex = SurfaceIndex.AuroraGlass;
         }
@@ -147,13 +151,32 @@ namespace Celeste.Mod.AnarchyCollab2022 {
 
                 if (blockFill != null) {
                     Vector2 camera_pos = SceneAs<Level>().Camera.Position.Floor();
-                    Rectangle sourceRectangle = new Rectangle((int)(base.X - camera_pos.X), (int)(base.Y - camera_pos.Y), (int)base.Width, (int)base.Height);
+                    Rectangle sourceRectangle = new Rectangle(
+                        (int)(X - camera_pos.X), (int)(Y - camera_pos.Y),
+                        (int)Width, (int)Height);
 
                     Draw.SpriteBatch.Draw((RenderTarget2D)blockFill, Position, sourceRectangle, Color.White);
                 }
             }
 
             base.Render();
+        }
+
+        internal static void Load() {
+            On.Celeste.Player.RefillDash += (refillDashHook = (On.Celeste.Player.orig_RefillDash orig, Player self) => {
+                if (self.Scene != null && (
+                    self.CollideCheck<FragmentsStarJumpBlock>(self.Position + Vector2.UnitY) ||
+                    self.CollideCheckOutside<FragmentsStarJumpthru>(self.Position + Vector2.UnitY)
+                    ) && self.CollideAll<Solid>(self.Position + Vector2.UnitY)
+                             .All((e) => (e is FragmentsStarJumpBlock || e is FragmentsStarJumpthru))) {
+                    return false;
+                }
+                return orig(self);
+            });
+        }
+
+        internal static void Unload() {
+            On.Celeste.Player.RefillDash -= refillDashHook;
         }
     }
 }

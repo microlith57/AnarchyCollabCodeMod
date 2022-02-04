@@ -26,12 +26,14 @@ namespace Celeste.Mod.AnarchyCollab2022 {
             };
             JankTempleCustomEvent.Load();
             ElevatorCutsceneUtils.Load();
+            FragmentsStarJumpBlock.Load();
         }
 
         public override void Unload() {
             On.Celeste.Level.End -= levelEndHook;
             JankTempleCustomEvent.Unload();
             ElevatorCutsceneUtils.Unload();
+            FragmentsStarJumpBlock.Unload();
         }
     }
 }
