@@ -83,7 +83,7 @@ namespace Celeste.Mod.AnarchyCollab2022.Content {
             // Update hair
             hair.Facing = (Sprite.Scale.X < 0) ? Facings.Left : Facings.Right;
             if (player != null) {
-                DynData<Player> dynPlayer = new DynData<Player>(player);
+                DynamicData dynPlayer = DynamicData.For(player);
 
                 Vector2 windDir = dynPlayer.Get<Vector2>("windDirection");
                 if (player.ForceStrongWindHair.Length() > 0) { windDir = player.ForceStrongWindHair; }

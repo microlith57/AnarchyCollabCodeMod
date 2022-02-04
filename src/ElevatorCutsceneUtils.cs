@@ -43,27 +43,24 @@ namespace Celeste.Mod.AnarchyCollab2022 {
 
         public static void FadeOutDust(Level level) {
             foreach (var dust in level.Background.GetEach<CustomDust>()) {
-                DynData<CustomDust> dyndata = new DynData<CustomDust>(dust);
-                dyndata.Set<bool>("should_patch_update", true);
+                DynamicData.For(dust).Set("should_patch_update", true);
             }
             foreach (var dust in level.Foreground.GetEach<CustomDust>()) {
-                DynData<CustomDust> dyndata = new DynData<CustomDust>(dust);
-                dyndata.Set<bool>("should_patch_update", true);
+                DynamicData.For(dust).Set("should_patch_update", true);
             }
         }
 
         internal static void Load() {
             On.Celeste.Backdrop.Update += backdrop_update_hook = (On.Celeste.Backdrop.orig_Update orig, Backdrop backdrop, Scene scene) => {
                 if (backdrop is CustomDust) {
-                    CustomDust dust = backdrop as CustomDust;
-                    DynData<CustomDust> dust_data = new DynData<CustomDust>(dust);
+                    var dust_data = DynamicData.For(backdrop);
 
-                    object flag = dust_data["should_patch_update"];
+                    object flag = dust_data.Get("should_patch_update");
                     if (flag is bool && (bool)flag) {
                         Array particles = dust_data.Get<Array>("particles");
                         for (int i = 0; i < particles.Length; i++) {
                             object particle = particles.GetValue(i);
-                            DynamicData particle_data = new DynamicData(particle);
+                            var particle_data = DynamicData.For(particle);
                             if (particle_data.Get<float>("Percent") >= 1f) {
                                 particle_data.Set("Percent", 0f);
                                 particle_data.Set("Duration", float.PositiveInfinity);
