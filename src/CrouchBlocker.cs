@@ -36,6 +36,11 @@ namespace Celeste.Mod.AnarchyCollab2022.Content {
             base.Removed(scene);
         }
 
+        public override void SceneEnd(Scene scene) {
+            if (blockGlobal) { GlobalBlockerCount--; }
+            base.SceneEnd(scene);
+        }
+
         internal static void Load() {
             // Add hooks
             updateHook = new ILHook(typeof(Player).GetMethod("NormalUpdate", BindingFlags.NonPublic | BindingFlags.Instance), ctx => {

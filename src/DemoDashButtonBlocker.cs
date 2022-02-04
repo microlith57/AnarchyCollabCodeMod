@@ -31,6 +31,11 @@ namespace Celeste.Mod.AnarchyCollab2022.Content {
             base.Removed(scene);
         }
 
+        public override void SceneEnd(Scene scene) {
+            if (blockGlobal) { GlobalBlockerCount--; }
+            base.SceneEnd(scene);
+        }
+
         internal static void Load() {
             // Add dash begin hook
             On.Celeste.Player.DashBegin += dashBeginHook = (On.Celeste.Player.orig_DashBegin orig, Player self) => {
