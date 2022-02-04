@@ -32,12 +32,18 @@ namespace Celeste.Mod.AnarchyCollab2022.Content {
         }
 
         public override void Removed(Scene scene) {
-            if (blockGlobal) { GlobalBlockerCount--; }
+            if (blockGlobal) {
+                GlobalBlockerCount--; 
+                blockGlobal = false;
+            }
             base.Removed(scene);
         }
 
         public override void SceneEnd(Scene scene) {
-            if (blockGlobal) { GlobalBlockerCount--; }
+            if (blockGlobal) {
+                GlobalBlockerCount--; 
+                blockGlobal = false;
+            }
             base.SceneEnd(scene);
         }
 
