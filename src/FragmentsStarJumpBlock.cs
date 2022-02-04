@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
-using Celeste;
 using Celeste.Mod.Entities;
 
 namespace Celeste.Mod.AnarchyCollab2022 {

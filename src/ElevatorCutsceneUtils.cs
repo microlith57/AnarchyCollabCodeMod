@@ -1,9 +1,4 @@
 using System;
-using System.Linq;
-using System.Collections;
-using System.Reflection;
-using Celeste;
-using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
 using MonoMod.Utils;
