@@ -13,21 +13,30 @@ using MonoMod.RuntimeDetour;
 
 namespace Celeste.Mod.AnarchyCollab2022.Content {
     [Tracked]
-    [CleanupRemove]
     [CustomEntity("AnarchyCollab2022/CrouchBlocker")]
     public class CrouchBlocker : Trigger {
+        protected static int GlobalBlockerCount = 0;
+        private static ILHook updateHook;
+        private static Hook duckingSetterHook;
+        private static On.Celeste.Player.hook_DashEnd dashEndHook;
+
         private bool blockGlobal;
-        private ILHook updateHook;
-        private Hook duckingSetterHook;
-        private On.Celeste.Player.hook_DashEnd dashEndHook;
 
         public CrouchBlocker(EntityData data, Vector2 offset) : base(data, offset) {
             blockGlobal = data.Bool("blockGlobal");
         }
 
         public override void Added(Scene scene) {
+            if (blockGlobal) { GlobalBlockerCount++; }
             base.Added(scene);
+        }
 
+        public override void Removed(Scene scene) {
+            if (blockGlobal) { GlobalBlockerCount--; }
+            base.Removed(scene);
+        }
+
+        internal static void Load() {
             // Add hooks
             updateHook = new ILHook(typeof(Player).GetMethod("NormalUpdate", BindingFlags.NonPublic | BindingFlags.Instance), ctx => {
                 // Find "Ducking = true;"
@@ -40,7 +49,7 @@ namespace Celeste.Mod.AnarchyCollab2022.Content {
 
                     // Emit check if we should crouch, and if we shouldn't, jump to end of if clause
                     cursor.Emit(OpCodes.Ldarg_0);
-                    cursor.EmitDelegate<Func<Player, bool>>(player => !blockGlobal && !player.CollideCheck<CrouchBlocker>());
+                    cursor.EmitDelegate<Func<Player, bool>>(player => CrouchBlocker.GlobalBlockerCount <= 0 && !player.CollideCheck<CrouchBlocker>());
                     cursor.Emit(OpCodes.Brfalse, dontDuckLabel);
 
                     // Return back to end of if clause
@@ -48,31 +57,24 @@ namespace Celeste.Mod.AnarchyCollab2022.Content {
                 }
             });
 
-            duckingSetterHook = new Hook(typeof(Player).GetProperty(nameof(Player.Ducking)).GetSetMethod(), (Action<Action<Player, bool>, Player, bool>)((orig, player, ducking) => {
-                if (ducking && !player.StartedDashing && (blockGlobal || player.CollideCheck<CrouchBlocker>())) {
+            duckingSetterHook = new Hook(typeof(Player).GetProperty(nameof(Player.Ducking)).GetSetMethod(), (Action<Action<Player, bool>, Player, bool>)((orig, self, ducking) => {
+                if (ducking && !self.StartedDashing && (CrouchBlocker.GlobalBlockerCount > 0 || self.CollideCheck<CrouchBlocker>())) {
                     return;
                 }
-                orig(player, ducking);
+                orig(self, ducking);
             }));
 
-            On.Celeste.Player.DashEnd += dashEndHook = (orig, player) => {
-                orig(player);
-                if (blockGlobal || player.CollideCheck<CrouchBlocker>()) { player.Ducking = false; }
+            On.Celeste.Player.DashEnd += dashEndHook = (orig, self) => {
+                orig(self);
+                if (CrouchBlocker.GlobalBlockerCount > 0 || self.CollideCheck<CrouchBlocker>()) { self.Ducking = false; }
             };
         }
 
-        public override void Removed(Scene scene) {
-            base.Removed(scene);
-
+        internal static void Unload() {
             // Remove hooks
-            if (updateHook != null) { updateHook.Dispose(); }
-            updateHook = null;
-
-            if (duckingSetterHook != null) { duckingSetterHook.Dispose(); }
-            duckingSetterHook = null;
-
-            if (dashEndHook != null) { On.Celeste.Player.DashEnd -= dashEndHook; }
-            dashEndHook = null;
+            updateHook.Dispose();
+            duckingSetterHook.Dispose();
+            On.Celeste.Player.DashEnd -= dashEndHook;
         }
     }
 }

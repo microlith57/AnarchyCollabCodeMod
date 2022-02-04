@@ -24,6 +24,8 @@ namespace Celeste.Mod.AnarchyCollab2022 {
 
                 orig(level);
             };
+            Content.CrouchBlocker.Load();
+            Content.DemoDashButtonBlocker.Load();
             JankTempleCustomEvent.Load();
             ElevatorCutsceneUtils.Load();
             FragmentsStarJumpBlock.Load();
@@ -31,6 +33,8 @@ namespace Celeste.Mod.AnarchyCollab2022 {
 
         public override void Unload() {
             On.Celeste.Level.End -= levelEndHook;
+            Content.CrouchBlocker.Unload();
+            Content.DemoDashButtonBlocker.Unload();
             JankTempleCustomEvent.Unload();
             ElevatorCutsceneUtils.Unload();
             FragmentsStarJumpBlock.Unload();
