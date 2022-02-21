@@ -1,7 +1,4 @@
-﻿using System;
-using Monocle;
-
-namespace Celeste.Mod.AnarchyCollab2022 {
+﻿namespace Celeste.Mod.AnarchyCollab2022 {
     public class AnarchyCollabModule : EverestModule {
 
         public static AnarchyCollabModule Instance { get; private set; }
