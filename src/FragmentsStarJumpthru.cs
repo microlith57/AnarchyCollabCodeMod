@@ -30,7 +30,16 @@ namespace Celeste.Mod.AnarchyCollab2022 {
     [Tracked]
     [CustomEntity("AnarchyCollab2022/FragmentsStarJumpthru")]
     public class FragmentsStarJumpthru : JumpthruPlatform {
+        public bool ConnectLeft = false, ConnectRight = false;
+
         public FragmentsStarJumpthru(EntityData data, Vector2 offset) : base(data.Position + offset, data.Width, "dream", -1) {
+        }
+
+        public override void Awake(Scene scene) {
+            base.Awake(scene);
+
+            ConnectLeft = CollideCheck<Solid, SwapBlock, ExitBlock>(Position - Vector2.UnitX);
+            ConnectRight = CollideCheck<Solid, SwapBlock, ExitBlock>(Position + Vector2.UnitX);
         }
 
         public override void Render() {
@@ -43,12 +52,20 @@ namespace Celeste.Mod.AnarchyCollab2022 {
                 DrawFill(blockFill, camera_pos, new Rectangle(0, 0, (int)Width, 3));
 
                 // Left Support
-                DrawFill(blockFill, camera_pos, new Rectangle(0, 3, 5, 2));
-                DrawFill(blockFill, camera_pos, new Rectangle(0, 3, 2, 5));
+                if (ConnectLeft) {
+                    DrawFill(blockFill, camera_pos, new Rectangle(0, 3, 5, 2));
+                    DrawFill(blockFill, camera_pos, new Rectangle(0, 3, 2, 5));
+                } else {
+                    DrawFill(blockFill, camera_pos, new Rectangle(1, 3, 3, 2));
+                }
 
                 // Right Support
-                DrawFill(blockFill, camera_pos, new Rectangle((int)Width - 5, 3, 5, 2));
-                DrawFill(blockFill, camera_pos, new Rectangle((int)Width - 2, 3, 2, 5));
+                if (ConnectRight) {
+                    DrawFill(blockFill, camera_pos, new Rectangle((int)Width - 5, 3, 5, 2));
+                    DrawFill(blockFill, camera_pos, new Rectangle((int)Width - 2, 3, 2, 5));
+                } else {
+                    DrawFill(blockFill, camera_pos, new Rectangle((int)Width - 4, 3, 3, 2));
+                }
             }
 
             base.Render();
