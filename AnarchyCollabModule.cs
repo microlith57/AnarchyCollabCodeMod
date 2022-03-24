@@ -14,6 +14,7 @@
             JankTempleCustomEvent.Load();
             ElevatorCutsceneUtils.Load();
             FragmentsStarJumpBlock.Load();
+            SimplifiedGraphicsController.Load();
         }
 
         public override void Unload() {
@@ -22,6 +23,7 @@
             JankTempleCustomEvent.Unload();
             ElevatorCutsceneUtils.Unload();
             FragmentsStarJumpBlock.Unload();
+            SimplifiedGraphicsController.Unload();
         }
     }
 }
