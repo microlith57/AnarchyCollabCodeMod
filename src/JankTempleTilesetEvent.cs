@@ -29,7 +29,7 @@ namespace Celeste.Mod.AnarchyCollab2022 {
             Audio.Play(SFX.game_10_glitch_medium);
             Glitch.Value = 0.3f;
             yield return 0.2f;
-            ReplaceTiles(level, 'd', 'J');
+            ReplaceTiles(level, 'T', 'J');
             yield return 0.2f;
             Glitch.Value = 0f;
         }
