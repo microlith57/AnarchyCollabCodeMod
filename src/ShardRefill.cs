@@ -20,8 +20,7 @@ namespace Celeste.Mod.AnarchyCollab2022 {
                 Depth = -1000000;
 
                 //Create sprite
-                Add(sprite = new Sprite(null, null));
-                GetCustomShardSprite(refill.ShardColor, false).CloneInto(sprite);
+                Add(sprite = Refill.Sprite.Clone());
                 sprite.Play("idle", randomizeFrame: true);
                 sprite.CenterOrigin();
                 sprite.Scale = new Vector2(SHARD_SCALE, SHARD_SCALE);
@@ -55,8 +54,8 @@ namespace Celeste.Mod.AnarchyCollab2022 {
                     //Feedback
                     Audio.Play("event:/game/general/diamond_touch", Position).setVolume(SHARD_SCALE * SHARD_SCALE);
                     Input.Rumble(RumbleStrength.Medium, RumbleLength.Short);
-                    (Scene as Level)?.ParticlesFG?.Emit(Refill.ShatterParticles, 3, Position, Vector2.One * 4f * SHARD_SCALE, (float)Math.PI / 2f);
-                    (Scene as Level)?.ParticlesFG?.Emit(Refill.ShatterParticles, 3, Position, Vector2.One * 4f * SHARD_SCALE, (float)Math.PI / 2f);
+                    (Scene as Level)?.ParticlesFG?.Emit(Refill.ShatterParticleType, 3, Position, Vector2.One * 4f * SHARD_SCALE, (float)Math.PI / 2f);
+                    (Scene as Level)?.ParticlesFG?.Emit(Refill.ShatterParticleType, 3, Position, Vector2.One * 4f * SHARD_SCALE, (float)Math.PI / 2f);
 
                     //Don't follow player anymore
                     Player.Leader.LoseFollower(follower);
@@ -99,9 +98,14 @@ namespace Celeste.Mod.AnarchyCollab2022 {
             return s != null;
         }
 
+        public readonly Color ShardColor;
+        public readonly float RespawnDelay;
         private Shard[] shards;
 
-        protected ShardRefill(Vector2 position, Color color, Color shardColor, bool doubleRefill, float respawnDelay = 2.5f) : base(position, color, doubleRefill, respawnDelay) => ShardColor = shardColor;
+        protected ShardRefill(Vector2 position, Color color, Color shardColor, bool doubleRefill, float respawnDelay = 2.5f) : base(position, color, doubleRefill, false) {
+            ShardColor = shardColor;
+            RespawnDelay = respawnDelay;
+        }
 
         public override void Added(Scene scene) {
             scene.Add(shards = Enumerable.Range(0, ShardRefillLimit).Select(_ => new Shard(this)).ToArray());
@@ -118,10 +122,10 @@ namespace Celeste.Mod.AnarchyCollab2022 {
                     shard.AttachToPlayer(player);
                 }
             }
-            return true;
+            Break(player, RespawnDelay);
+            return false;
         }
 
-        public Color ShardColor { get; }
         public virtual int ShardRefillLimit => DoubleRefill ? 2 : 1;
     }
 }
