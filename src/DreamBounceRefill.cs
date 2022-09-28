@@ -12,13 +12,12 @@ namespace Celeste.Mod.AnarchyCollab2022 {
         private static int bounceHookCounter = 0;
         private Sprite sprite;
 
-        public DreamBounceRefill(EntityData data, Vector2 offset) : base(data.Position + offset, data.Bool("doubleRefill") ? Color.DeepSkyBlue : Color.DarkMagenta, Color.DarkMagenta, data.Bool("doubleRefill"), data.Float("respawnDelay", 2.5f)) {
-            sprite = Components.Get<Sprite>();
-        }
+        public DreamBounceRefill(EntityData data, Vector2 offset) : base(data.Position + offset, data.Bool("doubleRefill") ? Color.DeepSkyBlue : Color.DarkMagenta, Color.DarkMagenta, data.Bool("doubleRefill"), data.Float("respawnDelay", 2.5f)) {}
 
         public override void Added(Scene scene) {
             if (bounceHookCounter++ <= 0) { On.Celeste.Player.DreamDashedIntoSolid += BounceHook; }
             base.Added(scene);
+            sprite = Components.Get<Sprite>();
         }
 
         public override void Removed(Scene scene) {
@@ -26,7 +25,13 @@ namespace Celeste.Mod.AnarchyCollab2022 {
             if (--bounceHookCounter <= 0) { On.Celeste.Player.DreamDashedIntoSolid -= BounceHook; }
         }
 
+        public override void Awake(Scene scene) {
+            base.Awake(scene);
+            sprite = Components.Get<Sprite>();
+        }
+
         public override void Render() {
+            if(sprite == null) return;
             if ((Scene as Level).Session.Inventory.DreamDash) {
                 sprite.Color = Color.White;
                 sprite.Scale = Vector2.One;
