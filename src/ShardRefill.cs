@@ -107,9 +107,9 @@ namespace Celeste.Mod.AnarchyCollab2022 {
             RespawnDelay = respawnDelay;
         }
 
-        public override void Added(Scene scene) {
+        public override void Awake(Scene scene) {
+            base.Awake(scene);
             scene.Add(shards = Enumerable.Range(0, ShardRefillLimit).Select(_ => new Shard(this)).ToArray());
-            base.Added(scene);
         }
 
         protected override bool OnTouch(Player player) {
