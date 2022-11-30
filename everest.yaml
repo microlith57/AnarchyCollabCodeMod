@@ -4,7 +4,5 @@
   Dependencies:
     - Name: Everest
       Version: 1.3164.0
-    - Name: Procedurline
-      Version: 1.0
     - Name: LunaticHelper
       Version: 1.1.1
