@@ -447,7 +447,7 @@ namespace Celeste.Mod.AnarchyCollab2022 {
 
             InitInputs();
 
-            GenerateBag();
+            
 
             Collider = new Grid(10, 20, 8, 8);
             Collider.Position = new Vector2(-40, -80);
@@ -459,9 +459,15 @@ namespace Celeste.Mod.AnarchyCollab2022 {
         }
 
         private void GenerateBag() {
-            foreach (TetrisState piece in AllPieces.OrderBy(a => Guid.NewGuid()).ToList()) {
+            // Change Randomizer
+            Calc.PushRandom((int)(SceneAs<Level>().Session.Time % int.MaxValue));
+            
+            foreach (TetrisState piece in AllPieces.OrderBy(a => Calc.Random.NextDouble()).ToList()) {
                 NextPieces.Add(piece);
             }
+
+            // Reset Randomizer
+            Calc.PopRandom();
         }
 
         public static void Load() {
@@ -510,6 +516,8 @@ namespace Celeste.Mod.AnarchyCollab2022 {
 
         public override void Added(Scene scene) {
             base.Added(scene);
+            GenerateBag();
+
             scene.Add(timer);
             scene.Add(lineClears);
         }
@@ -697,6 +705,9 @@ namespace Celeste.Mod.AnarchyCollab2022 {
             //TODO: change based on input
             lineClearsData["alpha"] = 1;
             lineClearsData["text"] = $"{LineCount} / {TotalLineCount}";
+
+            timer.Render();
+            lineClears.Render();
 
             //instead of doing this, have all the tiles maybe just be constant
             //remove all previous tiles
